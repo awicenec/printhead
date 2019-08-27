@@ -37,8 +37,11 @@
 #                         FitsHead.__init__
 # A.W. [ICRAR]:
 #             2019-08-27  Ported to Python3
-
-import sys,os, types, subprocess
+from printhead import __version__
+import sys
+import os
+import types
+import subprocess
 import string,re
 from glob import glob
 from zlib import crc32
@@ -876,7 +879,7 @@ class HeadDict(dict):
 
             if maxInd > (lenInd-1) and not lenInd-1 in self['index']:
                 newInd = lenInd-1
-            elif maxInd > (lenInd-1)  and not len_ind in self['index']:
+            elif maxInd > (lenInd-1)  and not lenInd in self['index']:
                 newInd = maxInd
             elif maxInd > 0 and self['index'][maxInd] == 'END'  and maxInd == lenInd-1:
                 newInd = maxInd

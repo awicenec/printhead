@@ -20,7 +20,7 @@
 ####
 # All of this is for the interactive version...
 ###
-__version__ = "5.0"
+from printhead import __version__
 from printhead.classes.FitsHead import FitsHead
 from printhead.classes.FitsHead import HeadDict
 
