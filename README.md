@@ -1,8 +1,20 @@
 # printhead
+
 FITS Header tool in pure python
 
 This small tool has a long history and come a long way from early versions of Python to the latest Python 3. Its original intend was to
 allow users to display FITS headers on screen using just a single shell command. Later a lot of additional functionality was added.
+
+## Installation
+
+Since it is pure python without any external dependencies installation is very simple.
+From the main directory where also this README file is located run:
+```
+pip install .
+```
+
+## Short User Guide
+
 The short help, which is displayed when calling it without any parameters like ./printhead.py, gives a brief overview of the functionality.
 ```
 Script dumps headers of FITS files to stdout or creates header
