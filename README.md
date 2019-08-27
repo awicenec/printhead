@@ -20,7 +20,7 @@ The short help, which is displayed when calling it without any parameters like .
 Script dumps headers of FITS files to stdout or creates header
 files. It supports compressed files (.gz and .Z)
 
-Synopsis: printhead.py [-s <KEYWORD> -H <number> -M <extnum> -S -x <type> -e -h]
+Synopsis: printhead [-s <KEYWORD> -H <number> -M <extnum> -S -x <type> -e -h]
  fname1 [fname2]...
 
 If only a file name is given, the primary header of that file is printed.
