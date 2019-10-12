@@ -796,6 +796,7 @@ class HeadDict(dict):
                 XmlHead.append((level+1)*indent*pretty + '<Comment>' + \
                                self.getKeyword(rkey)[2] + '</Comment>')
                 XmlHead.append(level*indent + '</' + rkey + '>')
+                openTags = []
 
 # COMMENT and HISTORY keywords
 
