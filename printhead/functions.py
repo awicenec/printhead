@@ -101,6 +101,20 @@ def run(args, skey='END', header=0, mode=1, struct=0, check=0):
 #            sys.exit('<ERROR> unable to open file:' +name+' <ERROR>')
         return pH
 
+def getval(name, key):
+    """
+    Function mimics the same functionality as the pyfits getval function.
+
+    Input:
+    name: string, file path and name
+    key: FITS keyword to search for
+
+    Output:
+    keyword value: string
+    """
+    pH = FitsHead(name, skey=key, show=0,
+        struct=0, check=0, mode=1)
+    return pH.Extension[0]['cards'][key]['Value']
 
 def tsvFunc(args, skey='END', header=0, mode=1):
         """

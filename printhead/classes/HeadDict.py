@@ -59,13 +59,13 @@ class HeadDict(dict):
     """
     This class defines the data structure used by FitsHead. Essentially the data structure
     consists of nested dictionaries (hash tables) with the following structure:
-        {'index':{<index1>:<keyword1>,<index2>:<keyword2>,...},'nodes':{<keyword1>:{'Value':<value1>,'Comment':<comment1>,'Type':<type1>},
+        {'index':{<index1>:<keyword1>,<index2>:<keyword2>,...},'cards':{<keyword1>:{'Value':<value1>,'Comment':<comment1>,'Type':<type1>},
                                                                         <keyword2>:{'Value':<value2>,'Comment':<comment2>,'Type':<type2>},...}}
 
     The 'index' dictionary keeps the sorting information of the keywords, where the key
     is the location of the keyword in the header and the value is the name of the keyword.
 
-    The 'nodes' dictionary contains the keyword name as the key. The value of a single node key
+    The 'cards' dictionary contains the keyword name as the key. The value of a single node key
     is again a dictionary. For normal standard keywords the value contains another dictionary,
     (keyval dictionary) which has the three keys 'Value', 'Comment' and 'Type'. For HIERARCH keywords it contains
     the next level in the hierarchy, where the leaf node contains finally a standard keyval
@@ -75,7 +75,7 @@ class HeadDict(dict):
     def __init__(self, number=0, pos=0):
         """
         """
-        self.update({'index':{},'nodes':{}})
+        self.update({'index':{},'cards':{}})
         self.POS = pos
         self.NUMBER = number
         self.HEADERSIZE = -1
@@ -203,11 +203,11 @@ class HeadDict(dict):
                 del(self['index'][maxInd])
                 maxInd = maxInd+1
                 self['index'].update({maxInd:'END'})
-            eval("testKey['nodes']"+fullInd+".update({'Comment':comment,'Value':value,'Type':typ})")
+            eval("testKey['cards']"+fullInd+".update({'Comment':comment,'Value':value,'Type':typ})")
             testKey.update({'index':{newInd:key}})
         elif force == 1:
             testKey = existKey.copy()
-            eval("testKey['nodes']"+fullInd+".update({'Comment':comment,'Value':value,'Type':typ})")
+            eval("testKey['cards']"+fullInd+".update({'Comment':comment,'Value':value,'Type':typ})")
         else:
             testKey = existKey
 
@@ -224,7 +224,7 @@ class HeadDict(dict):
         """
         hkeys = key.split()
         fullInd = ''
-        node = self['nodes']
+        node = self['cards']
         for hk in hkeys:
             node = node[hk]
         return node
@@ -246,10 +246,10 @@ class HeadDict(dict):
         Method returns the names of the descendant elements of a <key> as a tuple.
 
         INPUT:     string, keyword
-        OUTPUT:    string tuple, list of descendant nodes
+        OUTPUT:    string tuple, list of descendant cards
         """
-        nodes = self.getNode(key=key).keys()
-        return tuple(nodes)
+        cards = self.getNode(key=key).keys()
+        return tuple(cards)
 
 
 
@@ -257,7 +257,7 @@ class HeadDict(dict):
         """
         Method takes a keyword <key> and returns a dictionary of the HeadDict
         form for that key only.
-        If desc is different from 0 only the descendant nodes will be returned.
+        If desc is different from 0 only the descendant cards will be returned.
         If inst is different from 0 an HeadDict instance is returned.
 
         INPUT:     string, keyword
@@ -270,7 +270,7 @@ class HeadDict(dict):
         curkey = ''
         exists = 0
         keyDict = HeadDict()
-        node = self['nodes'].copy()
+        node = self['cards'].copy()
         for hk in hkeys:
             if hk in node and type(node[hk]) == type({}):
                 keys = node[hk].keys()
@@ -279,21 +279,21 @@ class HeadDict(dict):
                 if keys != ('Comment','Value','Type') and hk != hkeys[-1]:
                     if desc == 0:
                         keyDict.getNode(curkey).update({hk:{}})
-#                        eval("keyDict['nodes']"+fullInd+".update({hk:{}})")
+#                        eval("keyDict['cards']"+fullInd+".update({hk:{}})")
                 elif keys == ('Comment','Value','Type') or hk == hkeys[-1]:
                     if desc == 0:
                         keyDict.getNode(curkey).update({hk:node})
-#                        eval("keyDict['nodes']"+fullInd+".update({hk:node})")
+#                        eval("keyDict['cards']"+fullInd+".update({hk:node})")
                     else:
-                        keyDict['nodes'].update(node)
+                        keyDict['cards'].update(node)
 
             elif hk in node and type(node[hk]) != type({}):
                 node = node[hk]
                 if desc == 0:
                     keyDict.getNode(curkey).update({hk:node})
-#                    eval("keyDict['nodes']"+fullInd+".update({hk:node})")
+#                    eval("keyDict['cards']"+fullInd+".update({hk:node})")
                 else:
-                    keyDict['nodes'].update({hk:node})
+                    keyDict['cards'].update({hk:node})
 
             else:
                 exists = 0
@@ -303,9 +303,9 @@ class HeadDict(dict):
                     node = {hk:{}}
                 if desc == 0:
                     keyDict.getNode(curkey).update(node)
-#                    eval("keyDict['nodes']"+fullInd+".update(node)")
+#                    eval("keyDict['cards']"+fullInd+".update(node)")
                 else:
-                    keyDict['nodes'].update(node)
+                    keyDict['cards'].update(node)
 
             fullInd += "['"+hk+"']"
             curkey = (curkey+" "+hk).strip()
@@ -438,21 +438,21 @@ class HeadDict(dict):
 
 
         try:
-            val = eval("self['nodes']"+fullInd+"['Value']")
+            val = eval("self['cards']"+fullInd+"['Value']")
         except:
             if check == 1:
                 return None
             else:
                 val = ''
         try:
-            com = eval("self['nodes']"+fullInd+"['Comment']")
+            com = eval("self['cards']"+fullInd+"['Comment']")
         except:
             com = ''
         try:
-            if len(str(val)) > 0 and not eval("'Type' in self['nodes']"+fullInd):
+            if len(str(val)) > 0 and not eval("'Type' in self['cards']"+fullInd):
                 typ = self.getKeyType(key)
-            elif eval("'Type' in self['nodes']"+fullInd):
-                typ = eval("self['nodes']"+fullInd+"['Type']")
+            elif eval("'Type' in self['cards']"+fullInd):
+                typ = eval("self['cards']"+fullInd+"['Type']")
                 if typ == '':
                    typ = self.getKeyType(key)
             else:
@@ -483,7 +483,7 @@ class HeadDict(dict):
             fullInd = ''
             curkey = ''
 
-            node = keyDict['nodes']
+            node = keyDict['cards']
             oDict = self.getKeyDict(key,inst=1)
             for hk in hkeys:
                 if 'Value' in oDict.getNode(key=curkey)[hk]:
@@ -494,10 +494,10 @@ class HeadDict(dict):
                 if not test:
                     self.getNode(key=curkey).update({hk:node})
                 elif key in ['COMMENT', 'HISTORY', 'ESO-LOG']:
-                    if not key in self['nodes']:
-                        self['nodes'].update({key:node})
-                    self['nodes'][key]['Value'].\
-                         append(keyDict['nodes'][key]['Value'][0])
+                    if not key in self['cards']:
+                        self['cards'].update({key:node})
+                    self['cards'][key]['Value'].\
+                         append(keyDict['cards'][key]['Value'][0])
                 fullInd += "['"+hk+"']"
                 curkey = (curkey+" "+hk).strip()
 
@@ -547,13 +547,13 @@ class HeadDict(dict):
             fullInd += "['"+hk+"']"
 
 
-        if eval("'Type' in self['nodes']"+fullInd):
-            typ = eval("'Type' in self['nodes']"+fullInd)
+        if eval("'Type' in self['cards']"+fullInd):
+            typ = eval("'Type' in self['cards']"+fullInd)
         else:
             typ = ""
-        if eval("'Value' in self['nodes']"+fullInd):
+        if eval("'Value' in self['cards']"+fullInd):
 
-            val = eval("self['nodes']"+fullInd+"['Value']")
+            val = eval("self['cards']"+fullInd+"['Value']")
             if typ == 'C' or (type(val) == type('') and val.upper() in reserved):
                 typ = 'C'
             else:
@@ -595,10 +595,10 @@ class HeadDict(dict):
                 typ = 'T'
 
 
-            exec("self['nodes']"+fullInd+".update({'Type':typ})")
+            exec("self['cards']"+fullInd+".update({'Type':typ})")
             return typ
         else:
-            exec("self['nodes']"+fullInd+".update({'Type':''})")
+            exec("self['cards']"+fullInd+".update({'Type':''})")
 
             return ''
 
@@ -669,9 +669,9 @@ class HeadDict(dict):
 
                 if key[0:8] not in specialKeys:
                     fitsLine = key + (8 - len(key))*' '
-                    value = str(self['nodes'][key]['Value'])
-                    comment = self['nodes'][key]['Comment']
-                    typ = self['nodes'][key]['Type']
+                    value = str(self['cards'][key]['Value'])
+                    comment = self['cards'][key]['Comment']
+                    typ = self['cards'][key]['Type']
 
                     if len(value) > 0:
                         fitsLine += '= '
@@ -699,12 +699,12 @@ class HeadDict(dict):
 
                 elif key in ['COMMENT', 'HISTORY', 'ESO-LOG']:
                     comhist[key] += 1
-                    if type(self['nodes'][key]['Value']) == type([]):
-                        fitsLine = key + self['nodes'][key]['Value'][comhist[key]]
+                    if type(self['cards'][key]['Value']) == type([]):
+                        fitsLine = key + self['cards'][key]['Value'][comhist[key]]
                         fitsLine = fitsLine + (80-len(fitsLine))*' '
                         FHead.append(fitsLine)
-                    elif type(self['nodes'][key]['Value']) == type(''):
-                        fitsLine = key + self['nodes'][key]['Value']
+                    elif type(self['cards'][key]['Value']) == type(''):
+                        fitsLine = key + self['cards'][key]['Value']
                         fitsLine = fitsLine + (80-len(fitsLine))*' '
                         FHead.append(fitsLine)
 
@@ -722,12 +722,12 @@ class HeadDict(dict):
                     for hk in hkeys:
                         hind = hind + "['" + hk + "']"
 
-                        kkeys = eval("self['nodes']"+hind+".keys()")
+                        kkeys = eval("self['cards']"+hind+".keys()")
 
                     if kkeys.count("Value") > 0:
-                        value = str(eval("self['nodes']"+hind+"['Value']"))
-                        comment = eval("self['nodes']"+hind+"['Comment']")
-                        typ = eval("self['nodes']"+hind+"['Type']")
+                        value = str(eval("self['cards']"+hind+"['Value']"))
+                        comment = eval("self['cards']"+hind+"['Comment']")
+                        typ = eval("self['cards']"+hind+"['Type']")
                         if typ != 'C':
                             fitsLine = fitsLine + (43 - len(fitsLine) - \
                                                    len(value)) * ' '
@@ -868,11 +868,11 @@ class HeadDict(dict):
                     XmlHead.append(level*indent + '<'+hk+'>')
                     openTags = [hk] + openTags
 
-                    kkeys = eval("self['nodes']"+hind+".keys()")
+                    kkeys = eval("self['cards']"+hind+".keys()")
                     if kkeys.count('Value') > 0:
                         dum = kkeys.index("Value")
-                        value = eval("self['nodes']"+hind+"['Value']")
-                        comment = eval("self['nodes']"+hind+"['Comment']")
+                        value = eval("self['cards']"+hind+"['Value']")
+                        comment = eval("self['cards']"+hind+"['Comment']")
                         XmlHead.append((level+1)*indent*pretty + '<Value>' + \
                                        self.getKeyword(key)[1] + '</Value>')
                         XmlHead.append((level+1)*indent*pretty + '<Comment>' + \
@@ -914,8 +914,8 @@ class HeadDict(dict):
         openTags = ['']
 
         xstr = '<RESOURCE id="' + str(self.NUMBER) + '"'
-        if 'EXTNAME' in self['nodes']:
-           xstr = xstr + ' name="' + self['nodes']['EXTNAME']['Value'][1:-1] +'"'
+        if 'EXTNAME' in self['cards']:
+           xstr = xstr + ' name="' + self['cards']['EXTNAME']['Value'][1:-1] +'"'
 
         xstr = xstr + ' type="meta">'
         XmlHead.append(level*indent + xstr)
