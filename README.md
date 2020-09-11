@@ -9,14 +9,22 @@ allow users to display FITS headers on screen using just a single shell command.
 
 Since it is pure python without any external dependencies installation is very simple.
 From the main directory where also this README file is located run:
-```
+
+``` bash
 pip install .
 ```
 
 ## Short User Guide
 
-The short help, which is displayed when calling it without any parameters like ./printhead.py, gives a brief overview of the functionality.
+The short help, which is displayed when calling it without any parameters like 
+
+``` bash
+printhead
 ```
+
+gives a brief overview of the functionality.
+
+``` text
 Script dumps headers of FITS files to stdout or creates header
 files. It supports compressed files (.gz and .Z)
 
